@@ -1,18 +1,59 @@
 #include <Arduino.h>
 
-const int redPin = 11;
-const int greenPin = 10;
-const int bluePin = 9;
-const int buttonPin = 2;
-int buttonValue;
-int state;
+const int redButtonPin = 8;
+const int yellowButtonPin = 7;
+const int greenButtonPin = 2;
+int redButtonValue;
+int yellowButtonValue;
+int greenButtonValue;
+int mode;
+
+void cycleMode() { /* advances mode when yellow button is pressed, 
+    rolling over when mode 2 is reached
+    TODO: make this conditional on device not being in [EXAM MODE] - [EXAM MODE] should 
+    temporarily override all other buttons' functions*/
+    if (yellowButtonValue == LOW && mode < 2) {
+        mode += 1;
+    } else if (yellowButtonValue == LOW) {
+        mode = 0;
+    }
+}
+
+void listenForExamMode() { // forces [EXAM MODE] when red button is pressed
+    if (redButtonValue == LOW) {
+        mode = 3;
+    }
+}
+
+void listenForActiveFocusMode() { /* forces [ACTIVE FOCUS] when green button is pressed 
+    TODO: start stopwatch at the same time*/
+    if (greenButtonValue == LOW) {
+        mode = 1;
+    }
+}
+
+void displayMode() {
+    if (mode == 3) {
+        Serial.println("[EXAM MODE]"); // countdown timer
+        delay(250);
+    } else if (mode == 0) {
+        Serial.println("[CURRENT TIME]");
+        delay(250);
+    } else if (mode == 1) {
+        Serial.println("[ACTIVE FOCUS]"); // time accumulated this session (essentially a stopwatch)
+        delay(250);
+    } else if (mode == 2) {
+        Serial.println("[TIME TODAY]"); // time accumulated today
+        delay(250);
+    }
+}
 
 void setup() {
-    pinMode(redPin, OUTPUT);
-    pinMode(greenPin, OUTPUT);
-    pinMode(bluePin, OUTPUT);
-    pinMode(buttonPin, INPUT_PULLUP);
-    state = 0;
+    Serial.begin(9600);
+    pinMode(redButtonPin, INPUT_PULLUP);
+    pinMode(yellowButtonPin, INPUT_PULLUP);
+    pinMode(greenButtonPin, INPUT_PULLUP);
+    mode = 0;
 }
 
 void loop() {
@@ -21,30 +62,11 @@ void loop() {
     yellow: 255, 25, 0
     green: 0, 50, 0
     */
-    buttonValue = digitalRead(buttonPin); // links variable buttonValue (ON/OFF) to pin
-    if (buttonValue == LOW && state < 3) { // state advances upon button press
-        state += 1;
-        delay(500);
-    } else if (buttonValue == LOW) {
-        state = 0;
-        delay (500);
-    }
-
-    if (state == 0) {
-    analogWrite(redPin, 255);
-    analogWrite(greenPin, 0);
-    analogWrite(bluePin, 0);
-    } else if (state == 1) {
-        analogWrite(redPin, 255);
-        analogWrite(greenPin, 25);
-        analogWrite(bluePin, 0);
-    } else if (state == 2) {
-        analogWrite(redPin, 0);
-        analogWrite(greenPin, 50);
-        analogWrite(bluePin, 0);
-    } else if (state == 3) {
-        analogWrite(redPin, 0);
-        analogWrite(greenPin, 0);
-        analogWrite(bluePin, 255);
-    }
+    redButtonValue = digitalRead(redButtonPin); // links variable colourButtonValue to pin
+    yellowButtonValue = digitalRead(yellowButtonPin);
+    greenButtonValue = digitalRead(greenButtonPin);
+    cycleMode();
+    listenForExamMode();
+    listenForActiveFocusMode();
+    displayMode();
 }
