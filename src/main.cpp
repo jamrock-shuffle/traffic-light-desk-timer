@@ -10,7 +10,7 @@ int mode;
 
 void cycleMode() { /* advances mode when yellow button is pressed, 
     rolling over when mode 2 is reached
-    TODO: make this conditional on device not being in [EXAM MODE] - [EXAM MODE] should 
+    TO-DO: make this conditional on device not being in [EXAM MODE] - [EXAM MODE] should 
     temporarily override all other buttons' functions*/
     if (yellowButtonValue == LOW && mode < 2) {
         mode += 1;
@@ -26,25 +26,33 @@ void listenForExamMode() { // forces [EXAM MODE] when red button is pressed
 }
 
 void listenForActiveFocusMode() { /* forces [ACTIVE FOCUS] when green button is pressed 
-    TODO: start stopwatch at the same time*/
+    TO-DO: start stopwatch at the same time*/
     if (greenButtonValue == LOW) {
         mode = 1;
     }
 }
 
 void displayMode() {
-    if (mode == 3) {
-        Serial.println("[EXAM MODE]"); // countdown timer
-        delay(250);
-    } else if (mode == 0) {
-        Serial.println("[CURRENT TIME]");
-        delay(250);
-    } else if (mode == 1) {
-        Serial.println("[ACTIVE FOCUS]"); // time accumulated this session (essentially a stopwatch)
-        delay(250);
-    } else if (mode == 2) {
-        Serial.println("[TIME TODAY]"); // time accumulated today
-        delay(250);
+    switch (mode) {
+        case 0:
+            Serial.println("[CURRENT TIME]");
+            delay(250);
+            break;
+
+        case 1:
+            Serial.println("[ACTIVE FOCUS]"); // time accumulated this session (essentially a stopwatch)
+            delay(250);
+            break;
+
+        case 2: 
+            Serial.println("[TIME TODAY]"); // time accumulated today
+            delay(250);
+            break;
+
+        case 3:
+            Serial.println("[EXAM MODE]"); // countdown timer
+            delay(250);
+            break;
     }
 }
 
