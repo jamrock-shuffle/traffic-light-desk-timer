@@ -1,8 +1,8 @@
 #include <Arduino.h>
 
-const int redButtonPin = 8;
-const int yellowButtonPin = 7;
-const int greenButtonPin = 2;
+const int redButtonPin = 12;
+const int yellowButtonPin = 11;
+const int greenButtonPin = 10;
 int redButtonValue;
 int yellowButtonValue;
 int greenButtonValue;
