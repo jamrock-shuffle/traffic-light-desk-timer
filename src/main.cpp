@@ -13,22 +13,32 @@ int mode;
 
 void displayMode() {
     lcd.clear();
-    lcd.setCursor(0,0);
     switch (mode) {
         case 0:
-            lcd.print("[CURRENT TIME]");
+            lcd.setCursor(2,0);
+            lcd.print("you got this!");
+            lcd.setCursor(5,1);
+            lcd.print("00:00");
             break;
 
         case 1:
-            lcd.print("[ACTIVE FOCUS]"); // time accumulated this session (essentially a stopwatch)
+            lcd.print("current session"); // time accumulated this session (essentially a stopwatch)
+            lcd.setCursor(4,1);
+            lcd.print("00:00:00");
             break;
 
         case 2: 
-            lcd.print("[TIME TODAY]"); // time accumulated today
+            lcd.setCursor(3,0);
+            lcd.print("time today"); // time accumulated today
+            lcd.setCursor(4,1);
+            lcd.print("00:00:00");
             break;
 
         case 3:
+            lcd.setCursor(2,0);
             lcd.print("[EXAM MODE]"); // countdown timer
+            lcd.setCursor(4,1);
+            lcd.print("00:00:00");
             break;
     }
 }
@@ -77,7 +87,7 @@ void setup() {
     lcd.init();
     lcd.setCursor(0, 0);
     mode = 0;
-    lcd.print("[CURRENT TIME]");
+    displayMode();
 }
 
 void loop() {
