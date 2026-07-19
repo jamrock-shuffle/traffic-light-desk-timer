@@ -17,7 +17,6 @@ int mode;
 const char* months[] = {"ERR", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
 void displayMode() {
-    lcd.clear();
     switch (mode) {
         case 0:
         lcd.setCursor(3,1);
@@ -39,6 +38,7 @@ void displayMode() {
             break;
 
         case 1:
+            lcd.setCursor(0,0);
             lcd.print("current session"); // time accumulated this session (essentially a stopwatch)
             lcd.setCursor(4,1);
             lcd.print("00:00:00");
@@ -65,20 +65,20 @@ void cycleMode() { /* advances mode when yellow button is pressed,
     TO-DO: make this conditional on device not being in [EXAM MODE] - [EXAM MODE] should 
     temporarily override all other buttons' functions*/
     if (yellowButtonValue == LOW && mode < 2) {
+        lcd.clear();
         mode += 1;
-        displayMode();
         delay(200);
     } else if (yellowButtonValue == LOW) {
+        lcd.clear();
         mode = 0;
-        displayMode();
         delay(200);
     }
 }
 
 void listenForExamMode() { // forces [EXAM MODE] when red button is pressed
     if (redButtonValue == LOW) {
+        lcd.clear();
         mode = 3;
-        displayMode();
         delay(200);
     }
 }
@@ -86,8 +86,8 @@ void listenForExamMode() { // forces [EXAM MODE] when red button is pressed
 void listenForActiveFocusMode() { /* forces [ACTIVE FOCUS] when green button is pressed 
     TO-DO: start stopwatch at the same time*/
     if (greenButtonValue == LOW) {
+        lcd.clear();
         mode = 1;
-        displayMode();
         delay(200);
     }
 }
@@ -126,7 +126,9 @@ void loop() {
     redButtonValue = digitalRead(redButtonPin); // links variable colourButtonValue to pin
     yellowButtonValue = digitalRead(yellowButtonPin);
     greenButtonValue = digitalRead(greenButtonPin);
+
     cycleMode();
     listenForExamMode();
     listenForActiveFocusMode();
+    displayMode();
 }
