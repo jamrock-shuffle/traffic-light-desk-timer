@@ -55,6 +55,21 @@ void displaySession() {
     lcd.print(seconds);
 }
 
+void displayToday() {
+    int hours = timeToday/3600;
+    int minutes = (timeToday%3600) / 60;
+    int seconds = timeToday%60;
+
+    if (hours < 10) lcd.print('0');
+    lcd.print(hours);
+    lcd.print(':');
+    if (minutes < 10) lcd.print('0');
+    lcd.print(minutes);
+    lcd.print(':');
+    if (seconds < 10) lcd.print('0');
+    lcd.print(seconds);
+}
+
 void stopwatch() {
     if (stopwatchActive) {
         if (now.second() != prevSecond) {
@@ -82,7 +97,7 @@ void displayMode() {
             lcd.setCursor(3,0);
             lcd.print("time today"); // time accumulated today
             lcd.setCursor(4,1);
-            lcd.print("00:00:00");
+            displayToday();
             break;
 
         case 3:
