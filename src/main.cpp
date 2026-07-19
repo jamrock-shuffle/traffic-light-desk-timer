@@ -1,7 +1,10 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <LiquidCrystal_AIP31068_I2C.h>
+#include <RTClib.h>
 LiquidCrystal_AIP31068_I2C lcd(0x3E,16,2);
+RTC_DS3231 rtc;
+DateTime now;
 
 const int redButtonPin = 12;
 const int yellowButtonPin = 11;
@@ -11,14 +14,28 @@ int yellowButtonValue;
 int greenButtonValue;
 int mode;
 
+const char* months[] = {"ERR", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+
 void displayMode() {
     lcd.clear();
     switch (mode) {
         case 0:
-            lcd.setCursor(2,0);
-            lcd.print("you got this!");
-            lcd.setCursor(5,1);
-            lcd.print("00:00");
+        lcd.setCursor(3,1);
+            if(now.day() < 10) lcd.print('0'); // print day
+            lcd.print(now.day(), DEC);
+            lcd.print(' ');
+            
+            lcd.print(months[now.month()]); // print month
+            lcd.print(' ');
+
+            lcd.print(now.year() % 100, DEC); // print year
+            
+            lcd.setCursor(5,0); // print time
+            if(now.hour() < 10) lcd.print('0');
+            lcd.print(now.hour(), DEC);
+            lcd.print(':');
+            if(now.minute() < 10) lcd.print('0');
+            lcd.print(now.minute(), DEC);
             break;
 
         case 1:
@@ -85,8 +102,16 @@ void setup() {
     pinMode(greenButtonPin, INPUT_PULLUP);
 
     lcd.init();
-    lcd.setCursor(0, 0);
     mode = 0;
+
+    if (!rtc.begin()) {
+    lcd.clear();
+    lcd.print("RTC Error!");
+    while (1);
+    }
+
+    now = rtc.now();
+
     displayMode();
 }
 
@@ -96,6 +121,8 @@ void loop() {
     yellow: 255, 25, 0
     green: 0, 50, 0
     */
+    now = rtc.now();
+    
     redButtonValue = digitalRead(redButtonPin); // links variable colourButtonValue to pin
     yellowButtonValue = digitalRead(yellowButtonPin);
     greenButtonValue = digitalRead(greenButtonPin);
