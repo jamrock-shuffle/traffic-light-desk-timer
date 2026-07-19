@@ -17,6 +17,9 @@ bool stopwatchActive = false;
 int timeSession = 0;
 int timeToday = 0;
 int prevSecond = -1;
+bool countdownActive = false;
+bool timesUp = false;
+int examTime = 5400;
 
 const char* months[] = {"ERR", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
@@ -70,6 +73,31 @@ void displayToday() {
     lcd.print(seconds);
 }
 
+void displayCountdown() {
+    int hours = examTime/3600;
+    int minutes = (examTime%3600) / 60;
+    int seconds = examTime%60;
+
+    if (timesUp) {
+        lcd.clear();
+        lcd.setCursor(3,0);
+        lcd.print("TIME'S UP!");
+    } else {
+        lcd.setCursor(3,0);
+        lcd.print("EXAM  MODE");
+    }
+
+    lcd.setCursor(4,1);
+    if (hours < 10) lcd.print('0');
+    lcd.print(hours);
+    lcd.print(':');
+    if (minutes < 10) lcd.print('0');
+    lcd.print(minutes);
+    lcd.print(':');
+    if (seconds < 10) lcd.print('0');
+    lcd.print(seconds);
+}
+
 void stopwatch() {
     if (stopwatchActive) {
         if (now.second() != prevSecond) {
@@ -78,6 +106,20 @@ void stopwatch() {
             prevSecond = now.second();
         }
     } else timeSession = 0;
+}
+
+void countdown() {
+    if (countdownActive) {
+        if (now.second() != prevSecond && examTime > 0) {
+            examTime--;
+            prevSecond = now.second();
+        }
+        if (examTime == 0) {
+            countdownActive = false;
+            timesUp = true;
+            examTime = 5400;
+        }
+    }
 }
 
 void displayMode() {
@@ -101,10 +143,7 @@ void displayMode() {
             break;
 
         case 3:
-            lcd.setCursor(2,0);
-            lcd.print("[EXAM MODE]"); // countdown timer
-            lcd.setCursor(4,1);
-            lcd.print("00:00:00");
+            displayCountdown();
             break;
     }
 }
@@ -117,6 +156,8 @@ void listenForButtons() {
         if (redButtonValue == LOW) { // forces exam mode
             lcd.clear();
             mode = 3;
+            if (countdownActive == false) countdownActive = true;
+            if (timesUp) timesUp = false;
             lastPressed = millis();
         }
 
@@ -175,5 +216,6 @@ void loop() {
 
     listenForButtons();
     stopwatch();
+    countdown();
     displayMode();
 }
