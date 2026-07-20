@@ -2,7 +2,8 @@
 #include <Wire.h>
 #include <LiquidCrystal_AIP31068_I2C.h>
 #include <RTClib.h>
-LiquidCrystal_AIP31068_I2C lcd(0x3E,16,2);
+#include "time.h"
+#include "display.h"
 RTC_DS3231 rtc;
 DateTime now;
 
@@ -13,140 +14,6 @@ int redButtonValue;
 int yellowButtonValue;
 int greenButtonValue;
 int mode;
-bool stopwatchActive = false;
-int timeSession = 0;
-int timeToday = 0;
-int prevSecond = -1;
-bool countdownActive = false;
-bool timesUp = false;
-int examTime = 5400;
-
-const char* months[] = {"ERR", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-
-void displayClock() {
-    lcd.setCursor(3,1);
-    
-    if(now.day() < 10) lcd.print('0'); // print day
-    lcd.print(now.day());
-    lcd.print(' ');
-            
-    lcd.print(months[now.month()]); // print month
-    lcd.print(' ');
-
-    lcd.print(now.year() % 100); // print year
-            
-    lcd.setCursor(5,0); // print time
-    if(now.hour() < 10) lcd.print('0');
-    lcd.print(now.hour());
-    lcd.print(':');
-    if(now.minute() < 10) lcd.print('0');
-    lcd.print(now.minute());
-}
-
-void displaySession() {
-    int hours = timeSession/3600;
-    int minutes = (timeSession%3600) / 60;
-    int seconds = timeSession%60;
-
-    if (hours < 10) lcd.print('0');
-    lcd.print(hours);
-    lcd.print(':');
-    if (minutes < 10) lcd.print('0');
-    lcd.print(minutes);
-    lcd.print(':');
-    if (seconds < 10) lcd.print('0');
-    lcd.print(seconds);
-}
-
-void displayToday() {
-    int hours = timeToday/3600;
-    int minutes = (timeToday%3600) / 60;
-    int seconds = timeToday%60;
-
-    if (hours < 10) lcd.print('0');
-    lcd.print(hours);
-    lcd.print(':');
-    if (minutes < 10) lcd.print('0');
-    lcd.print(minutes);
-    lcd.print(':');
-    if (seconds < 10) lcd.print('0');
-    lcd.print(seconds);
-}
-
-void displayCountdown() {
-    int hours = examTime/3600;
-    int minutes = (examTime%3600) / 60;
-    int seconds = examTime%60;
-
-    if (timesUp) {
-        lcd.clear();
-        lcd.setCursor(3,0);
-        lcd.print("TIME'S UP!");
-    } else {
-        lcd.setCursor(3,0);
-        lcd.print("EXAM  MODE");
-    }
-
-    lcd.setCursor(4,1);
-    if (hours < 10) lcd.print('0');
-    lcd.print(hours);
-    lcd.print(':');
-    if (minutes < 10) lcd.print('0');
-    lcd.print(minutes);
-    lcd.print(':');
-    if (seconds < 10) lcd.print('0');
-    lcd.print(seconds);
-}
-
-void stopwatch() {
-    if (stopwatchActive) {
-        if (now.second() != prevSecond) {
-            timeSession++;
-            timeToday++;
-            prevSecond = now.second();
-        }
-    } else timeSession = 0;
-}
-
-void countdown() {
-    if (countdownActive) {
-        if (now.second() != prevSecond && examTime > 0) {
-            examTime--;
-            prevSecond = now.second();
-        }
-        if (examTime == 0) {
-            countdownActive = false;
-            timesUp = true;
-            examTime = 5400;
-        }
-    }
-}
-
-void displayMode() {
-    switch (mode) {
-        case 0:
-            displayClock();
-            break;
-
-        case 1:
-            lcd.setCursor(0,0);
-            lcd.print("current session"); // time accumulated this session (essentially a stopwatch)
-            lcd.setCursor(4,1);
-            displaySession();
-            break;
-
-        case 2: 
-            lcd.setCursor(3,0);
-            lcd.print("time today"); // time accumulated today
-            lcd.setCursor(4,1);
-            displayToday();
-            break;
-
-        case 3:
-            displayCountdown();
-            break;
-    }
-}
 
 void listenForButtons() {
     static unsigned long lastPressed;
@@ -199,7 +66,7 @@ void setup() {
 
     now = rtc.now();
 
-    displayMode();
+    displayMode(mode);
 }
 
 void loop() {
@@ -217,5 +84,5 @@ void loop() {
     listenForButtons();
     stopwatch();
     countdown();
-    displayMode();
+    displayMode(mode);
 }
