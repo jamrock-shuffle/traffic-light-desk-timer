@@ -69,7 +69,8 @@ void displayCountdown() {
         lcd.print("EXAM  MODE");
     }
 
-    lcd.setCursor(4,1);
+    lcd.setCursor(0,1);
+    lcd.print("    ");
     if (hours < 10) lcd.print('0');
     lcd.print(hours);
     lcd.print(':');
@@ -78,6 +79,7 @@ void displayCountdown() {
     lcd.print(':');
     if (seconds < 10) lcd.print('0');
     lcd.print(seconds);
+    lcd.print("   ");
 }
 
 void displayMode(int mode) {

@@ -15,39 +15,84 @@ int yellowButtonValue;
 int greenButtonValue;
 int mode;
 
-void listenForButtons() {
+void listenForButtons()
+{
     static unsigned long lastPressed;
 
-    if (millis() - lastPressed > 150) { // button debouncing
-
-        if (redButtonValue == LOW) { // forces exam mode
-            lcd.clear();
-            mode = 3;
-            if (countdownActive == false) countdownActive = true;
-            if (timesUp) timesUp = false;
-            lastPressed = millis();
+    if (millis() - lastPressed > 150)
+    { // button debouncing
+        if (countdownActive)
+        {
+            if (redButtonValue == LOW)
+            {
+                if (timesUp)
+                {
+                    timesUp = false;
+                }
+                countdownActive = false;
+                examTime = 5400;
+                lastPressed = millis();
+            }
         }
+        else if (mode == 3)
+        { // exam mode setup
+            if (redButtonValue == LOW)
+            { // start countdown
+                countdownActive = true;
+                lastPressed = millis();
+            }
 
-        if (yellowButtonValue == LOW && mode < 2) { // advances mode when yellow button is pressed,
-            lcd.clear(); // rolling over when mode 2 is reached
-            mode += 1;
-            lastPressed = millis();
-        } else if (yellowButtonValue == LOW) {
-            lcd.clear();
-            mode = 0;
-            lastPressed = millis();
+            if (yellowButtonValue == LOW)
+            { // -5min
+                examTime = (examTime >= 300) ? (examTime - 300) : 0;
+                Serial.print(examTime);
+                lastPressed = millis();
+            }
+
+            if (greenButtonValue == LOW)
+            { // +5min
+                examTime = examTime + 300;
+                Serial.print(examTime);
+                lastPressed = millis();
+            }
         }
+        else
+        {
+            if (redButtonValue == LOW)
+            { // forces exam mode
+                lcd.clear();
+                mode = 3;
+                if (timesUp)
+                    timesUp = false;
+                lastPressed = millis();
+            }
 
-        if (greenButtonValue == LOW) { // forces mode 1
-            lcd.clear();
-            mode = 1;
-            stopwatchActive = !stopwatchActive; // toggles stopwatch
-            lastPressed = millis();
+            if (yellowButtonValue == LOW && mode < 2)
+            {                // advances mode when yellow button is pressed,
+                lcd.clear(); // rolling over when mode 2 is reached
+                mode += 1;
+                lastPressed = millis();
+            }
+            else if (yellowButtonValue == LOW)
+            {
+                lcd.clear();
+                mode = 0;
+                lastPressed = millis();
+            }
+
+            if (greenButtonValue == LOW)
+            { // forces mode 1
+                lcd.clear();
+                mode = 1;
+                stopwatchActive = !stopwatchActive; // toggles stopwatch
+                lastPressed = millis();
+            }
         }
     }
 }
 
-void setup() {
+void setup()
+{
     Serial.begin(9600);
     Wire.begin();
 
@@ -58,10 +103,12 @@ void setup() {
     lcd.init();
     mode = 0;
 
-    if (!rtc.begin()) {
-    lcd.clear();
-    lcd.print("RTC Error!");
-    while (1);
+    if (!rtc.begin())
+    {
+        lcd.clear();
+        lcd.print("RTC Error!");
+        while (1)
+            ;
     }
 
     now = rtc.now();
@@ -69,14 +116,15 @@ void setup() {
     displayMode(mode);
 }
 
-void loop() {
+void loop()
+{
     /* COLOUR RGB VALUES
     red: 255, 0, 0
     yellow: 255, 25, 0
     green: 0, 50, 0
     */
     now = rtc.now();
-    
+
     redButtonValue = digitalRead(redButtonPin); // links variable colourButtonValue to pin
     yellowButtonValue = digitalRead(yellowButtonPin);
     greenButtonValue = digitalRead(greenButtonPin);
