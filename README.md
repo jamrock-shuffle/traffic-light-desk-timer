@@ -23,4 +23,11 @@ SP: short press\
 LP: long press\
 DP: double press
 
-## **Bill of Materials**
+### **Bill of Materials**
+| Item | Qty | Unit Cost (USD) | Total Cost (USD) | Source |
+| --- | --- | :---: | :---: | --- |
+| Arduino Nano V3 CH340 | 1 | 1.82 | 1.82 |
+| 30mm Arcade Button (Red) | 1 | 0.28 | 0.28 |
+| 30mm Arcade Button (Yellow) | 1 | 0.28 | 0.28 |
+| 30mm Arcade Button (Green) | 1 | 0.28 | 0.28 |
+| LCD 1602 Display with I2C (White Text on Black Backlight) | 1 | 2.51 | 2.51 |
