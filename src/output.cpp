@@ -2,27 +2,35 @@
 #include "time.h"
 
 bool buzzerOn = false;
+int shortBeeps = 0;
 LiquidCrystal_AIP31068_I2C lcd(0x3E,16,2);
 
 const char* months[] = {"ERR", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
 void alarm() {
     static unsigned long lastFlipped0, lastFlipped1;
-
-    if (millis() - lastFlipped0 > 250) 
-    {
-        if (buzzerOn == false) 
+    if (millis() - lastFlipped1 > 650) {
+        if (shortBeeps < 4) 
         {
-            tone(buzzerPin, 1500);
-            lastFlipped0 = millis();
-            buzzerOn = true;
-        }
-        else if (buzzerOn == true)
+            if (millis() - lastFlipped0 > 50) 
+            {
+                lastFlipped0 = millis();
+                buzzerOn = !buzzerOn;
+                if (buzzerOn)
+                {
+                    tone(buzzerPin, 2000);
+                }
+                else if (!buzzerOn)
+                {
+                    noTone(buzzerPin);
+                    shortBeeps++;
+                }
+            }
+        } else
         {
-            noTone(buzzerPin);
-            lastFlipped0 = millis();
-            buzzerOn = false;
-        }
+            shortBeeps = 0;
+            lastFlipped1 = millis();
+        }    
     }
 }
 
