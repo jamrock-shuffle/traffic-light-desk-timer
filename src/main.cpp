@@ -3,14 +3,14 @@
 #include <LiquidCrystal_AIP31068_I2C.h>
 #include <RTClib.h>
 #include "time.h"
-#include "display.h"
+#include "output.h"
 RTC_DS3231 rtc;
 DateTime now;
 
+const int buzzerPin = 6;
 const int redButtonPin = 12;
 const int yellowButtonPin = 11;
 const int greenButtonPin = 10;
-const int buzzerPin = 6;
 int redButtonValue;
 int yellowButtonValue;
 int greenButtonValue;
@@ -31,7 +31,7 @@ void listenForButtons()
                     timesUp = false;
                 }
                 countdownActive = false;
-                examTime = 5400;
+                examTime = 5; // CHANGE
                 lastPressed = millis();
             }
         }
@@ -124,7 +124,7 @@ void loop()
     red: 255, 0, 0
     yellow: 255, 25, 0
     green: 0, 50, 0
-    
+    */
     now = rtc.now();
 
     redButtonValue = digitalRead(redButtonPin); // links variable colourButtonValue to pin
@@ -134,10 +134,5 @@ void loop()
     listenForButtons();
     stopwatch();
     countdown();
-    displayMode(mode); */
-
-    digitalWrite(buzzerPin, LOW);
-    delayMicroseconds(250);
-    digitalWrite(buzzerPin, HIGH);
-    delayMicroseconds(250);
+    displayMode(mode);
 }

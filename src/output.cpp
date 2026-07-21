@@ -1,9 +1,16 @@
-#include "display.h"
+#include "output.h"
 #include "time.h"
 
 LiquidCrystal_AIP31068_I2C lcd(0x3E,16,2);
 
 const char* months[] = {"ERR", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+
+void alarm() {
+    digitalWrite(buzzerPin, LOW);
+    delayMicroseconds(250);
+    digitalWrite(buzzerPin, HIGH);
+    delayMicroseconds(250);
+}
 
 void displayClock() {
     lcd.setCursor(3,1);
@@ -64,9 +71,12 @@ void displayCountdown() {
         lcd.clear();
         lcd.setCursor(3,0);
         lcd.print("TIME'S UP!");
+        alarm();
     } else {
         lcd.setCursor(3,0);
         lcd.print("EXAM  MODE");
+        digitalWrite(buzzerPin, HIGH);
+        // examTime = 5400;
     }
 
     lcd.setCursor(0,1);
