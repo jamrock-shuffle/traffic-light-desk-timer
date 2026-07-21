@@ -10,6 +10,7 @@ DateTime now;
 const int redButtonPin = 12;
 const int yellowButtonPin = 11;
 const int greenButtonPin = 10;
+const int buzzerPin = 6;
 int redButtonValue;
 int yellowButtonValue;
 int greenButtonValue;
@@ -99,6 +100,7 @@ void setup()
     pinMode(redButtonPin, INPUT_PULLUP);
     pinMode(yellowButtonPin, INPUT_PULLUP);
     pinMode(greenButtonPin, INPUT_PULLUP);
+    pinMode(buzzerPin, OUTPUT);
 
     lcd.init();
     mode = 0;
@@ -122,7 +124,7 @@ void loop()
     red: 255, 0, 0
     yellow: 255, 25, 0
     green: 0, 50, 0
-    */
+    
     now = rtc.now();
 
     redButtonValue = digitalRead(redButtonPin); // links variable colourButtonValue to pin
@@ -132,5 +134,10 @@ void loop()
     listenForButtons();
     stopwatch();
     countdown();
-    displayMode(mode);
+    displayMode(mode); */
+
+    digitalWrite(buzzerPin, LOW);
+    delayMicroseconds(250);
+    digitalWrite(buzzerPin, HIGH);
+    delayMicroseconds(250);
 }
