@@ -1,15 +1,29 @@
 #include "output.h"
 #include "time.h"
 
+bool buzzerOn = false;
 LiquidCrystal_AIP31068_I2C lcd(0x3E,16,2);
 
 const char* months[] = {"ERR", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
 void alarm() {
-    digitalWrite(buzzerPin, LOW);
-    delayMicroseconds(250);
-    digitalWrite(buzzerPin, HIGH);
-    delayMicroseconds(250);
+    static unsigned long lastFlipped0, lastFlipped1;
+
+    if (millis() - lastFlipped0 > 250) 
+    {
+        if (buzzerOn == false) 
+        {
+            tone(buzzerPin, 1500);
+            lastFlipped0 = millis();
+            buzzerOn = true;
+        }
+        else if (buzzerOn == true)
+        {
+            noTone(buzzerPin);
+            lastFlipped0 = millis();
+            buzzerOn = false;
+        }
+    }
 }
 
 void displayClock() {
@@ -75,7 +89,7 @@ void displayCountdown() {
     } else {
         lcd.setCursor(3,0);
         lcd.print("EXAM  MODE");
-        digitalWrite(buzzerPin, HIGH);
+        noTone(buzzerPin);
         // examTime = 5400;
     }
 
