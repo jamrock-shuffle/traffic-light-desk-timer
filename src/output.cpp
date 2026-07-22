@@ -3,18 +3,18 @@
 
 bool buzzerOn = false;
 int shortBeeps = 0;
+static unsigned long lastFlippedBuzzer, lastSetEnded;
 LiquidCrystal_AIP31068_I2C lcd(0x3E,16,2);
 
 const char* months[] = {"ERR", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
 void alarm() {
-    static unsigned long lastFlipped0, lastFlipped1;
-    if (millis() - lastFlipped1 > 650) {
+    if (millis() - lastSetEnded > 650) { // wait 650ms between sets of 4 beeps
         if (shortBeeps < 4) 
         {
-            if (millis() - lastFlipped0 > 50) 
+            if (millis() - lastFlippedBuzzer > 50) 
             {
-                lastFlipped0 = millis();
+                lastFlippedBuzzer = millis();
                 buzzerOn = !buzzerOn;
                 if (buzzerOn)
                 {
@@ -29,7 +29,7 @@ void alarm() {
         } else
         {
             shortBeeps = 0;
-            lastFlipped1 = millis();
+            lastSetEnded = millis();
         }    
     }
 }
