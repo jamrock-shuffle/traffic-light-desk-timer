@@ -7,28 +7,7 @@ currentSession: Stopwatch for tracking study time in current session.\
 timeToday: Displays total accumulated study time for the day, updates live.\
 examRunning: Countdown timer for practice tests.
 
-```mermaid
-stateDiagram-v2
-    %%direction LR
-    state "examSetup" as examSetup
-    [*] --> clock
-
-    clock --> examSetup: Red
-    examSetup: Yellow / -5min
-    examSetup: Green / +5min
-    examSetup --> examRunning: Red / countdownActive = true
-    examSetup --> clock: Red [Hold]
-    examRunning --> timeToday: after examTime is up / countdownActive = false
-    examRunning --> examSetup: Red [Hold] /countdownActive = false
-
-    clock --> timeToday: Yellow [if !stopwatchActive]
-    clock --> currentSession: Yellow [if stopwatchActive]
-    timeToday --> clock: Yellow
-
-    clock --> currentSession: Green / stopwatchActive = true
-    currentSession --> timeToday: Yellow
-    currentSession --> timeToday: Green / stopwatchActive = false
-```
+![State diagram](state-diagram.drawio.svg)
 
 ### **Bill of Materials**
 | Item | Qty | Unit Cost (USD) | Total Cost (USD) | Source |
