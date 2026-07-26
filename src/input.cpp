@@ -12,11 +12,6 @@ int redButtonValue;
 int yellowButtonValue;
 int greenButtonValue;
 
-/*const int buzzerPin = 6;
-const int redButtonPin = 12;
-const int yellowButtonPin = 11;
-const int greenButtonPin = 10;*/
-
 void buttonSetup() {
     pinMode(redButtonPin, INPUT_PULLUP);
     pinMode(yellowButtonPin, INPUT_PULLUP);
@@ -33,7 +28,7 @@ void readButtons() {
 void stateMachine() {
     static unsigned long lastPressed;
 
-    if (millis() - lastPressed > 150) // button debouncing
+    if (millis() - lastPressed > 300) // button debouncing
     {
         switch (currentState) {
             case state::clock:
@@ -41,7 +36,6 @@ void stateMachine() {
                     {
                         currentState = state::examSetup;
                         lastPressed = millis();
-                        break;
                     }
                 else if (yellowButtonValue == LOW)
                 {
@@ -49,12 +43,10 @@ void stateMachine() {
                     if (stopwatchActive)
                     {
                         currentState = state::currentSession;
-                        break;
                     }
                     else
                     {
                         currentState = state::timeToday;
-                        break;
                     }
                 }
                 else if (greenButtonValue == LOW)
@@ -62,30 +54,33 @@ void stateMachine() {
                     lastPressed = millis();
                     currentState = state::currentSession;
                     stopwatchActive = true;
-                    break;
                 }
+                break;
 
             case state::currentSession:
                 if (yellowButtonValue == LOW)
                 {
                     currentState = state::timeToday;
                     lastPressed = millis();
-                    break;
                 }
                 else if (greenButtonValue == LOW)
                 {
                     currentState = state::timeToday;
                     stopwatchActive = false;
                     lastPressed = millis();
-                    break;
                 }
+                break;
 
             case state::timeToday:
-                if (yellowButtonValue == LOW)
+                if (redButtonValue == LOW)
+                {
+                    currentState = state::examSetup;
+                    lastPressed = millis();
+                }
+                else if (yellowButtonValue == LOW)
                 {
                     currentState = state::clock;
                     lastPressed = millis();
-                    break;
                 }
                 else if (greenButtonValue == LOW)
                 {
@@ -94,37 +89,57 @@ void stateMachine() {
                     {
                         currentState = state::currentSession;
                         stopwatchActive = true;
-                        break;
                     }
                     else
                     {
                         stopwatchActive = false;
-                        break;
                     }
                 }
+                break;
 
             case state::examSetup:
-                if (redButtonValue == LOW)
+                if (redButtonValue == LOW && greenButtonValue == LOW)
+                {
+                    currentState = state::timeToday;
+                    lastPressed = millis();
+                }
+                else if (yellowButtonValue == LOW && greenButtonValue == LOW)
+                {
+                    examTime += (examTime/4);
+                    lastPressed = millis();
+                }
+                else if (redButtonValue == LOW)
                 {
                     countdownActive = true;
                     currentState = state::examRunning;
                     lastPressed = millis();
-                    break;
                 }
                 else if (yellowButtonValue == LOW)
                 {
                     examTime-=5;
                     lastPressed = millis();
-                    break;
                 }
                 else if (greenButtonValue == LOW)
                 {
                     examTime+=5;
                     lastPressed = millis();
-                    break;
                 }
+                break;
             
             case state::examRunning:
+                if (redButtonValue == LOW && greenButtonValue == LOW)
+                {
+                    countdownActive = false;
+                    timesUp = false;
+                    currentState = state::timeToday;
+                    lastPressed = millis();
+                }
+                else if (timesUp && (redButtonValue == LOW || yellowButtonValue == LOW || greenButtonValue == LOW))
+                {
+                    timesUp = false;
+                    currentState = state::timeToday;
+                    lastPressed = millis();
+                }
                 break;
         }
     }

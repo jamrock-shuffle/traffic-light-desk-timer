@@ -90,7 +90,6 @@ void displayCountdown() {
     int seconds = examTime%60;
 
     if (timesUp) {
-        lcd.clear();
         lcd.setCursor(3,0);
         lcd.print("TIME'S UP!");
         alarm();
@@ -98,7 +97,6 @@ void displayCountdown() {
         lcd.setCursor(3,0);
         lcd.print("EXAM  MODE");
         noTone(buzzerPin);
-        // examTime = 5400;
     }
 
     lcd.setCursor(0,1);

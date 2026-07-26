@@ -14,9 +14,11 @@ void setup()
 {
     Serial.begin(9600);
     Wire.begin();
+    Wire.setWireTimeout(3000, true);
 
     buttonSetup();
 
+    delay(100);
     lcd.init();
 
     if (!rtc.begin())
@@ -26,7 +28,7 @@ void setup()
         while (1);
     }
 
-    // rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); Run this the first time you upload the code!
+    // rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); // Run this the first time you upload the code!
     now = rtc.now();
 
     displayMode(currentState);
@@ -55,8 +57,9 @@ void loop()
         displayMode(currentState);
         prevState = currentState;
     }
-    else
+    else if (now.second() != prevSecond)
     {
+        prevSecond = now.second();
         displayMode(currentState);
     }
 }
