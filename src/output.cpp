@@ -114,27 +114,32 @@ void displayCountdown() {
     lcd.print("   ");
 }
 
-void displayMode(int mode) {
-    switch (mode) {
-        case 0:
+void displayMode(state currentState) {
+    switch (currentState) 
+    {
+        case state::clock:
             displayClock();
             break;
-
-        case 1:
+        
+        case state::currentSession:
             lcd.setCursor(0,0);
-            lcd.print("current session"); // time accumulated this session (essentially a stopwatch)
+            lcd.print("current session");
             lcd.setCursor(4,1);
             displaySession();
             break;
-
-        case 2: 
+        
+        case state::timeToday:
             lcd.setCursor(3,0);
-            lcd.print("time today"); // time accumulated today
+            lcd.print("time today");
             lcd.setCursor(4,1);
             displayToday();
             break;
+        
+        case state::examSetup:
+            displayCountdown();
+            break;
 
-        case 3:
+        case state::examRunning:
             displayCountdown();
             break;
     }

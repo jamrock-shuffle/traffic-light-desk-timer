@@ -30,78 +30,102 @@ void readButtons() {
     greenButtonValue = digitalRead(greenButtonPin);
 }
 
-void listenForButtons()
-{
+void stateMachine() {
     static unsigned long lastPressed;
 
-    if (millis() - lastPressed > 150)
-    { // button debouncing
-        if (countdownActive)
-        {
-            if (redButtonValue == LOW)
-            {
-                if (timesUp)
+    if (millis() - lastPressed > 150) // button debouncing
+    {
+        switch (currentState) {
+            case state::clock:
+                if (redButtonValue == LOW)
+                    {
+                        currentState = state::examSetup;
+                        lastPressed = millis();
+                        break;
+                    }
+                else if (yellowButtonValue == LOW)
                 {
-                    timesUp = false;
+                    lastPressed = millis();
+                    if (stopwatchActive)
+                    {
+                        currentState = state::currentSession;
+                        break;
+                    }
+                    else
+                    {
+                        currentState = state::timeToday;
+                        break;
+                    }
                 }
-                countdownActive = false;
-                examTime = 5; // CHANGE
-                lastPressed = millis();
-            }
-        }
-        else if (mode == 3)
-        { // exam mode setup
-            if (redButtonValue == LOW)
-            { // start countdown
-                countdownActive = true;
-                lastPressed = millis();
-            }
+                else if (greenButtonValue == LOW)
+                {
+                    lastPressed = millis();
+                    currentState = state::currentSession;
+                    stopwatchActive = true;
+                    break;
+                }
 
-            if (yellowButtonValue == LOW)
-            { // -5min
-                examTime = (examTime >= 300) ? (examTime - 300) : 0;
-                Serial.print(examTime);
-                lastPressed = millis();
-            }
+            case state::currentSession:
+                if (yellowButtonValue == LOW)
+                {
+                    currentState = state::timeToday;
+                    lastPressed = millis();
+                    break;
+                }
+                else if (greenButtonValue == LOW)
+                {
+                    currentState = state::timeToday;
+                    stopwatchActive = false;
+                    lastPressed = millis();
+                    break;
+                }
 
-            if (greenButtonValue == LOW)
-            { // +5min
-                examTime = examTime + 300;
-                Serial.print(examTime);
-                lastPressed = millis();
-            }
-        }
-        else
-        {
-            if (redButtonValue == LOW)
-            { // forces exam mode
-                lcd.clear();
-                mode = 3;
-                if (timesUp)
-                    timesUp = false;
-                lastPressed = millis();
-            }
+            case state::timeToday:
+                if (yellowButtonValue == LOW)
+                {
+                    currentState = state::clock;
+                    lastPressed = millis();
+                    break;
+                }
+                else if (greenButtonValue == LOW)
+                {
+                    lastPressed = millis();
+                    if (!stopwatchActive)
+                    {
+                        currentState = state::currentSession;
+                        stopwatchActive = true;
+                        break;
+                    }
+                    else
+                    {
+                        stopwatchActive = false;
+                        break;
+                    }
+                }
 
-            if (yellowButtonValue == LOW && mode < 2)
-            {                // advances mode when yellow button is pressed,
-                lcd.clear(); // rolling over when mode 2 is reached
-                mode += 1;
-                lastPressed = millis();
-            }
-            else if (yellowButtonValue == LOW)
-            {
-                lcd.clear();
-                mode = 0;
-                lastPressed = millis();
-            }
-
-            if (greenButtonValue == LOW)
-            { // forces mode 1
-                lcd.clear();
-                mode = 1;
-                stopwatchActive = !stopwatchActive; // toggles stopwatch
-                lastPressed = millis();
-            }
+            case state::examSetup:
+                if (redButtonValue == LOW)
+                {
+                    countdownActive = true;
+                    currentState = state::examRunning;
+                    lastPressed = millis();
+                    break;
+                }
+                else if (yellowButtonValue == LOW)
+                {
+                    examTime-=5;
+                    lastPressed = millis();
+                    break;
+                }
+                else if (greenButtonValue == LOW)
+                {
+                    examTime+=5;
+                    lastPressed = millis();
+                    break;
+                }
+            
+            case state::examRunning:
+                break;
         }
     }
 }

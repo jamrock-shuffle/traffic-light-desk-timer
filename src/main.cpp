@@ -7,8 +7,8 @@
 #include "output.h"
 RTC_DS3231 rtc;
 DateTime now;
-int mode = 0;
-
+state prevState = state::clock;
+state currentState = state::clock;
 
 void setup()
 {
@@ -23,27 +23,40 @@ void setup()
     {
         lcd.clear();
         lcd.print("RTC Error!");
-        while (1)
-            ;
+        while (1);
     }
 
+    // rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); Run this the first time you upload the code!
     now = rtc.now();
 
-    displayMode(mode);
+    displayMode(currentState);
 }
+
 
 void loop()
 {
+    
     /* COLOUR RGB VALUES
     red: 255, 0, 0
     yellow: 255, 25, 0
-    green: 0, 50, 0
-    */
+    green: 0, 50, 0 */
+    
+    
     now = rtc.now();
 
     readButtons();
-    listenForButtons();
+    stateMachine();
     stopwatch();
     countdown();
-    displayMode(mode);
+
+    if (currentState != prevState) 
+    {
+        lcd.clear();
+        displayMode(currentState);
+        prevState = currentState;
+    }
+    else
+    {
+        displayMode(currentState);
+    }
 }
