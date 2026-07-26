@@ -137,6 +137,8 @@ void stateMachine() {
                 else if (timesUp && (redButtonValue == LOW || yellowButtonValue == LOW || greenButtonValue == LOW))
                 {
                     timesUp = false;
+                    countdownActive = false;
+                    examTime = 5;
                     currentState = state::timeToday;
                     lastPressed = millis();
                 }
