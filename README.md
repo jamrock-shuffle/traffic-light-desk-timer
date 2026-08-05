@@ -18,4 +18,4 @@ examRunning: Countdown timer for practice tests.
 | 30mm Arcade Button (Green) | 1 | 0.28 | 0.28 |
 | LCD 1602 Display with I2C (White Text on Black Backlight) | 1 | 2.51 | 2.51 |
 | Buzzer module | 1 | 0.50 | 0.50 |
-| RGB LED | 3 | 0.059 | 0.18 |
+| 5mm Frosted Common Cathode RGB LED | 3 | 0.059 | 0.18 |

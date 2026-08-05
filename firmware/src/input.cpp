@@ -4,9 +4,9 @@
 #include <LiquidCrystal_AIP31068_I2C.h>
 
 const int buzzerPin = 6;
-const int redButtonPin = 12;
-const int yellowButtonPin = 11;
-const int greenButtonPin = 10;
+const int redButtonPin = 4;
+const int yellowButtonPin = 3;
+const int greenButtonPin = 2;
 
 int redButtonValue;
 int yellowButtonValue;
